@@ -1,5 +1,22 @@
-local increasing = {[416] = 417, [426] = 425, [446] = 447, [3216] = 3217, [3202] = 3215, [11062] = 11063}
-local decreasing = {[417] = 416, [425] = 426, [447] = 446, [3217] = 3216, [3215] = 3202, [11063] = 11062}
+local increasing = {
+	--[itemid] = {itemtransform, version}
+	[419] = {420, 0},
+	[431] = {430, 0},
+	[452] = {453, 0},
+	[563] = {564, 0},
+	[549] = {562, 0},
+	[10145] = {10146, 853}
+}
+
+local decreasing = {
+	--[itemid] = {itemtransform, version}
+	[420] = {419, 0},
+	[430] = {431, 0},
+	[453] = {452, 0},
+	[564] = {563, 0},
+	[562] = {549, 0},
+	[10146] = {10145, 853}
+}
 
 local itemAdjusting = nil
 if GAME_FEATURE_STASH then
@@ -14,7 +31,7 @@ local tile = MoveEvent()
 tile:type("stepin")
 
 function tile.onStepIn(creature, item, position, fromPosition)
-	if not increasing[item.itemid] then
+	if not increasing[item.itemid][1] then
 		return true
 	end
 
@@ -22,7 +39,7 @@ function tile.onStepIn(creature, item, position, fromPosition)
 		return true
 	end
 
-	item:transform(increasing[item.itemid])
+	item:transform(increasing[item.itemid][1])
 
 	if item.actionid >= 1000 then
 		if creature:getLevel() < item.actionid - 1000 then
@@ -56,17 +73,18 @@ function tile.onStepIn(creature, item, position, fromPosition)
 	return true
 end
 
-if(CLIENT_VERSION >= 853) then
-	tile:id(11062)
+for increasingIndex, increasingValue in pairs(increasing) do
+	if(CLIENT_VERSION >= increasingValue[2]) then
+		tile:id(increasingIndex)
+	end
 end
-tile:id(416, 426, 446, 3216)
 tile:register()
 
 tile = MoveEvent()
 tile:type("stepout")
 
 function tile.onStepOut(creature, item, position, fromPosition)
-	if not decreasing[item.itemid] then
+	if not decreasing[item.itemid][1] then
 		return true
 	end
 
@@ -78,12 +96,13 @@ function tile.onStepOut(creature, item, position, fromPosition)
 		creature:setSpecialContainersAvailable(false, false)
 	end
 
-	item:transform(decreasing[item.itemid])
+	item:transform(decreasing[item.itemid][1])
 	return true
 end
 
-if(CLIENT_VERSION >= 853) then
-	tile:id(11063)
+for decreasingIndex, decreasingValue in pairs(decreasing) do
+	if(CLIENT_VERSION >= decreasingValue[2]) then
+		tile:id(decreasingIndex)
+	end
 end
-tile:id(417, 425, 447, 3217)
 tile:register()
